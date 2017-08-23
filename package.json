@@ -1,7 +1,7 @@
 {
     "name": "lajax",
-    "version": "1.0.0",
-    "description": "send log via ajax，手动或自动收集前端日志并通过ajax自动发送到服务端",
+    "version": "0.9.0",
+    "description": "log + ajax，前端日志解决方案。",
     "main": "src/lajax.js",
     "dependencies": {
         "body-parser": "^1.17.2",
@@ -26,9 +26,9 @@
     },
     "keywords": [
         "log",
-        "autolog",
+        "logger",
         "ajax"
     ],
-    "author": "Sky",
+    "author": "Sky.Sun",
     "license": "MIT"
 }
