@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width" name="viewport">
+    <meta id="LOCATION" name="location" content="province=;city=;coord=,">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="applicable-device" content="mobile">
+    <meta name="fragment" content="!" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="applicable-device" content="mobile">
+    <title id="_title">lajax</title>
+    <meta id="_keywords" name="Keywords" content="lajax">
+    <meta id="_description" name="Description" content="lajax">
+    <style>
+        body {
+            margin: 20px 10px;
+        }
+
+        button {
+            display: block;
+            height: 30px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="../dist/build.js"></script> 
+    <h2>lajax demo</h2>
+    <h4>请按 F12 打开控制台查看输出</h4>
+    <button id="btn1">手动：点我记一条info日志</button>
+    <button id="btn2">手动：点我记一条warn日志</button>
+    <button id="btn3">手动：点我记一条error日志</button>
+    <button id="btn4">自动：点我产生一个错误</button>
+    <button id="btn5">自动：点我产生一个Promise异常</button>
+    <button id="btn6">自动：点我发送一个成功的ajax请求</button>
+    <button id="btn7">自动：点我发送一个失败的ajax请求</button>
+    <button id="btn8">自动：点我发送一个超时的ajax请求</button>
+    <button id="btn9">点我发送ajax请求但不记录日志</button>
+    <script>
+        var logger = new Lajax({
+            url: 'http://127.0.0.1:2017/log',
+            autoLogError: true,
+            autoLogRejection: true,
+            autoLogAjax: true,
+            logAjaxFilter: function(url, method) {
+                // 排除掉特定的接口请求
+                if (url === 'http://www.taobao.com' && method.toLowerCase() === 'get') {
+                    return false;
+                }
+                return true;
+            },
+            stylize: true,
+            showDesc: true,
+            // customDesc: function(lastUnsend, reqId, idFromServer) {
+            //     return '当前请求id：' + reqId;
+            // },
+            interval: 10000,
+            maxErrorReq: 5
+        });
+
+        document.querySelector('#btn1').addEventListener('click', function () {
+            var num = parseInt(Math.random() * 100);
+            logger.info('这是一条info日志', '会产生一个随机数：', num);
+        });
+
+        document.querySelector('#btn2').addEventListener('click', function () {
+            logger.warn('这是一条warn日志');
+        });
+
+        document.querySelector('#btn3').addEventListener('click', function () {
+            try {
+                JSON.parse(undefined);
+            } catch(err) {
+                logger.error('这是一条error日志', '捕获到一个错误：', err);
+            }
+        });
+
+        document.querySelector('#btn4').addEventListener('click', function () {
+            // 这行代码将导致一个未捕获的异常
+            var a = undefined.test;
+        });
+
+        document.querySelector('#btn5').addEventListener('click', function () {
+            var promise = new Promise(function (resolve, reject) {
+                // 这行代码将导致一个未捕获的异常
+                var a = undefined.test;
+                resolve();
+            });
+
+            promise.then(function () {
+                console.log('success');
+            });
+        });
+
+        document.querySelector('#btn6').addEventListener('click', function () {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'index.html');
+            xhr.addEventListener('readystatechange', function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    console.log('Done1!');
+                }
+            });
+            xhr.send(null);
+        });
+
+        document.querySelector('#btn7').addEventListener('click', function () {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'notfound.html');
+            xhr.send(null);
+            xhr.addEventListener('readystatechange', function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    console.log('Done2!');
+                }
+            });
+        });
+
+        document.querySelector('#btn8').addEventListener('click', function () {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'http://不存在.com');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    console.log('Done3!');
+                }
+            }
+            xhr.send(JSON.stringify({ a: 1, b: 2 }));
+        });
+
+        document.querySelector('#btn9').addEventListener('click', function () {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'http://www.taobao.com');
+            xhr.send(null);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    console.log('Done4!');
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

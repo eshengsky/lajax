@@ -1,0 +1,34 @@
+{
+    "name": "lajax",
+    "version": "1.0.0",
+    "description": "send log via ajax，手动或自动收集前端日志并通过ajax自动发送到服务端",
+    "main": "src/lajax.js",
+    "dependencies": {
+        "body-parser": "^1.17.2",
+        "express": "^4.15.4"
+    },
+    "devDependencies": {
+        "babel-core": "^6.5.1",
+        "babel-loader": "^6.2.2",
+        "babel-preset-es2015": "^6.5.0",
+        "chai": "^4.1.1",
+        "file-loader": "^0.8.5",
+        "html-loader": "^0.3.0",
+        "mocha": "^3.5.0",
+        "raw-loader": "^0.5.1",
+        "sinon": "^3.2.1",
+        "text-loader": "0.0.1",
+        "url-loader": "^0.5.7",
+        "webpack": "^1.12.13"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "log",
+        "autolog",
+        "ajax"
+    ],
+    "author": "Sky",
+    "license": "MIT"
+}
