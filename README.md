@@ -2,34 +2,25 @@
 log + ajax，前端日志解决方案。
 
 <a href="https://www.npmjs.com/package/lajax"><img src="https://img.shields.io/npm/v/lajax.svg" alt="Version"></a>
-<a href="https://www.npmjs.com/package/lajax"><img src="https://img.shields.io/npm/dm/lajax.svg" alt="Downloads"></a>
 <a href="https://www.npmjs.com/package/lajax"><img src="https://img.shields.io/npm/l/lajax.svg" alt="License"></a>
 
 lajax 尝试解决这些问题：
 
-* 前端无日志，或者有日志也无持久化，导致难以对线上问题进行排查。
+* 前端无日志，或者有日志也无持久化，导致难以对线上问题进行追溯和分析；
 
-    **解决方案**：定时批量发送前端日志到日志服务器。
+* 就算使用了前端日志库，通常也依赖于开发人员手动记日志，不可靠；
 
-* 就算使用了前端日志库，通常也需要开发人员手动记日志，不可靠。
+* 生产环境中未捕获的异常往往都被忽略了；
 
-    **解决方案**：自动记录 ajax 请求的开始和完成。
+* 手机端浏览器看不到 `console` 打印的日志，在过去通常使用 `alert` 或 [vConsole](https://github.com/WechatFE/vConsole) 定位问题，但缺陷是需要专门为此修改源码；
 
-* 在过去未捕获的异常往往都被忽略了。
-
-    **解决方案**：自动捕获页面错误和 Promise 异常并记录。
-
-* 手机端浏览器看不到 `console` 打印的内容，在过去一般是使用 `alert` 或 [vConsole](https://github.com/WechatFE/vConsole) 定位问题（但都需要修改源码）。
-
-    **解决方案**：由于前端日志会被发送到服务端，可以在服务端查看和分析任意设备传输过来的日志。
-
-* 对于服务器动态生成的页面，原有的服务端日志无法和前端日志对应起来。
-
-    **解决方案**：通过请求 id 机制将服务端日志和前端日志关联起来。
+* 对于服务器动态生成的网页，系统原有的服务端日志无法和前端日志进行关联。
 
 ## 功能特性
 
 * 手动记录日志，支持 `info`，`warn`，`error` 3 种日志级别；
+
+* 日志会以优化后的格式打印在浏览器控制台；
 
 * 自动记录未捕获的脚本错误；
 
@@ -38,8 +29,6 @@ lajax 尝试解决这些问题：
 * 自动记录 ajax 请求的开始和完成；
 
 * 自动生成基于请求的唯一 id，方便日志定位；
-
-* 日志会以优化后的格式打印在浏览器控制台；
 
 * 日志会定时批量发送到配置的日志服务器；
 
