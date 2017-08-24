@@ -1,31 +1,31 @@
 # lajax
 log + ajax，前端日志解决方案。
 
+<a href="https://www.npmjs.com/package/lajax"><img src="https://img.shields.io/npm/v/lajax.svg" alt="Version"></a>
+<a href="https://www.npmjs.com/package/lajax"><img src="https://img.shields.io/npm/dm/lajax.svg" alt="Downloads"></a>
+<a href="https://www.npmjs.com/package/lajax"><img src="https://img.shields.io/npm/l/lajax.svg" alt="License"></a>
+
 lajax 尝试解决这些问题：
 
 * 前端无日志，或者有日志也无持久化，导致难以对线上问题进行排查。
 
-    解决方案：定时批量发送前端日志到日志服务器。
+    **解决方案**：定时批量发送前端日志到日志服务器。
 
 * 就算使用了前端日志库，通常也需要开发人员手动记日志，不可靠。
 
-    解决方案：自动记录 ajax 请求的开始和完成。
+    **解决方案**：自动记录 ajax 请求的开始和完成。
 
 * 在过去未捕获的异常往往都被忽略了。
 
-    解决方案：自动捕获页面错误和 Promise 异常并记录。
+    **解决方案**：自动捕获页面错误和 Promise 异常并记录。
 
 * 手机端浏览器看不到 `console` 打印的内容，在过去一般是使用 `alert` 或 [vConsole](https://github.com/WechatFE/vConsole) 定位问题（但都需要修改源码）。
 
-    解决方案：由于前端日志会被发送到服务端，可以在服务端查看和分析任意设备传输过来的日志。
+    **解决方案**：由于前端日志会被发送到服务端，可以在服务端查看和分析任意设备传输过来的日志。
 
 * 对于服务器动态生成的页面，原有的服务端日志无法和前端日志对应起来。
 
-    解决方案：通过请求 id 机制将服务端日志和前端日志关联起来。
-
-* 作为前端开发最常用的浏览器控制台，有必要对输出做一点优化。
-
-    解决方案：增加日志颜色显示、对 ajax 请求日志进行分组、增加时间显示等。
+    **解决方案**：通过请求 id 机制将服务端日志和前端日志关联起来。
 
 ## 功能特性
 
@@ -59,7 +59,7 @@ lajax 尝试解决这些问题：
 <script src="./dist/build.min.js"></script>
 ```
 
-* 也支持 ES6 模块方式导入
+* 也支持 ES2015 模块方式导入
 
 ```js
 import Lajax from './src/lajax-module';
@@ -89,6 +89,8 @@ try {
 
 ### 如何打包
 
+lajax 使用了 ES2015 语法，当前需要使用 webpack 打包后才能正常使用。
+
 * 安装必须的模块
 
 ```bash
@@ -101,18 +103,30 @@ try {
 > webpack
 ```
 
+打包后的文件目录是 `./dist`，其中 `build.js` 是未压缩版本，`build.min.js` 是压缩版本。
+
 ## Api
 
 ### new Lajax(Options)
 
 初始化插件，返回一个插件的实例。
 
-`Options`: 字符串或对象。如果传入的是字符串，会被当做日志服务器地址：
+`Options`: 字符串或对象。如果传入的是字符串，会被当作日志服务器地址：
 
 ```js
 const logger = new Lajax('https://path/to/your/log/server');
 ```
-如果你想自定义一些配置，请传入一个对象，对象支持的属性如下：
+
+如果你想自定义一些配置，请传入一个对象：
+
+```js
+const logger = new Lajax({
+    url: 'https://path/to/your/log/server',
+    interval: 5000
+});
+```
+
+对象支持的全部属性如下：
 
 <table>
     <tr>
@@ -263,7 +277,7 @@ Lajax.colorEnum = {
 
 ## 日志格式
 
-通过 ajax 发送给服务器的日志，一定是一个非空数组。我们同时记录 2 条日志：
+通过 ajax 发送给服务器的日志，一定是一个非空数组。这里同时记录 2 条日志：
 
 ```js
 logger.info('这是一条info日志', 'Hello', 'lajax');
@@ -288,18 +302,23 @@ logger.warn('这是一条warn日志');
 }]
 ```
 
-各字段的说明：
+各字段说明：
+
 * `time`: 字符串，该条日志记录的时间
+
 * `level`: 字符串，该条日志的级别，分为 `info`、`warn`、`error` 3 种
+
 * `messages`: 数组，数组的第一个元素是大括号包裹的唯一[请求id](#请求id)，之后的所有元素对应调用 `logger[level]` 依次传入的日志内容
+
 * `url`: 字符串，该条日志所在页面的 URL
+
 * `agent`: 字符串，该条日志所在页面的用户代理
 
 ## 请求id
 
 发送到服务器的每一条日志，都包含一个请求 id。在同一次请求中，所有日志的请求 id 一定相同；在不同请求中，各自记录的日志的请求 id 一定不同。
 
-该请求 id 的主要目的是：让你能够在服务端精确定位到某次请求过程中的所有相关日志。
+该请求 id 的主要目的：让你能够在服务端精确定位到某次请求过程中的所有相关日志。
 
 请求 id 的生成逻辑：
 
@@ -307,15 +326,27 @@ logger.warn('这是一条warn日志');
 
 * 如果上述的寻找失败了，则认为你的页面是一个纯前端的页面，lajax 将会在初始化时生成一个基于时间的唯一 id 来作为请求 id，在页面卸载之前，所有的日志都将包含该请求 id。
 
-## 示例
+## 服务器示例
 
-在 `./demo` 目录中，包含了一个前端示例页面 `index.html` 和一个基于 [node.js](https://nodejs.org/en/) 的日志服务器示例 `server.js`。
+在 `./demo` 目录中，包含了一个基于 [node.js](https://nodejs.org/en/) 的简单的日志服务器示例 [server.js](https://github.com/eshengsky/lajax/blob/master/demo/server.js)。
 
-你可以通过执行 `node server.js` 启动一个日志服务器，日志接口地址是 [http://127.0.0.1:2017/log](http://127.0.0.1:2017/log)
+启动日志服务器：
+
+```bash
+> node server.js
+```
+
+日志接口运行在 [http://127.0.0.1:2017/log](http://127.0.0.1:2017/log)，本地测试时，将 Lajax 的初始化参数设为该地址即可：
+
+```js
+const logger = new Lajax('http://127.0.0.1:2017/log');
+```
+
+该示例服务器支持 ajax 跨域请求 :)
 
 ## 测试
 
-访问 `./test/index.html` 以运行测试。
+本地访问 `./test/index.html` 页面以运行测试。
 
 ## 许可
 The MIT License (MIT)
