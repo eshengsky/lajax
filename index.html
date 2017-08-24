@@ -33,7 +33,7 @@
 </head>
 
 <body>
-    <script src="./dist/build.js"></script> 
+    <script src="./dist/build.min.js"></script> 
     <h2>lajax demo</h2>
     <h4>请按 F12 打开控制台查看输出</h4>
     <button id="btn1">手动：点我记一条info日志</button>
@@ -47,7 +47,7 @@
     <button id="btn9">点我发送ajax请求但不记录日志</button>
     <script>
         var logger = new Lajax({
-            url: 'http://127.0.0.1:2017/log',
+            url: 'http://www.skysun.name/lajax',
             autoLogError: true,
             autoLogRejection: true,
             autoLogAjax: true,
