@@ -378,13 +378,15 @@
 	                    // 请求开始时间
 	                    var startTime = new Date();
 
-	                    // 添加一条日志到队列中
-	                    that._pushToQueue(startTime, Lajax.levelEnum.info, '[ajax] \u53D1\u9001' + this._lajaxMethod.toLowerCase() + '\u8BF7\u6C42\uFF1A' + this._lajaxUrl);
+	                    // 添加一条日志到队列中，排除掉用户自定义不需要记录日志的 ajax
+	                    if (that.logAjaxFilter(this._lajaxUrl, this._lajaxMethod)) {
+	                        that._pushToQueue(startTime, Lajax.levelEnum.info, '[ajax] \u53D1\u9001' + this._lajaxMethod.toLowerCase() + '\u8BF7\u6C42\uFF1A' + this._lajaxUrl);
+	                    }
 
 	                    // 添加 readystatechange 事件
 	                    this.addEventListener('readystatechange', function () {
-	                        // 排除掉自身发送日志的 ajax 和用户自定义不需要记录日志的 ajax
-	                        if (this._lajaxUrl !== that.url && that.logAjaxFilter(this._lajaxUrl, this._lajaxMethod)) {
+	                        // 排除掉用户自定义不需要记录日志的 ajax
+	                        if (that.logAjaxFilter(this._lajaxUrl, this._lajaxMethod)) {
 	                            try {
 	                                if (this.readyState === XMLHttpRequest.DONE) {
 	                                    // 这里将发送接口请求的日志打印到控制台和添加到队列分开执行
