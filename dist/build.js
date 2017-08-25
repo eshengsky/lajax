@@ -532,17 +532,19 @@
 	            if (logCount) {
 	                // 如果存在 this.xhr，说明上一次的请求还没有结束，就又准备发送新的请求了，则直接终止上次请求
 	                if (this.xhr) {
+	                    // 这里必须将上次的回调设为null，否则会打印出请求失败
+	                    this.xhr.onreadystatechange = null;
 	                    this.xhr.abort();
 	                }
 	                this.xhr = new XMLHttpRequest();
 	                this.xhrOpen.call(this.xhr, 'POST', this.url, true);
 	                this.xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
 	                this.xhrSend.call(this.xhr, JSON.stringify(this.queue));
-	                this.xhr.addEventListener('readystatechange', function () {
+	                this.xhr.onreadystatechange = function () {
 	                    if (_this4.xhr.readyState === XMLHttpRequest.DONE) {
 	                        if (_this4.xhr.status >= 200 && _this4.xhr.status < 400) {
-	                            // 只有日志发送成功，才清除队列
-	                            _this4.queue = [];
+	                            // 日志发送成功，从队列中去除已发送的
+	                            _this4.queue.splice(0, logCount);
 
 	                            // 重置请求出错次数
 	                            _this4.errorReq = 0;
@@ -561,7 +563,7 @@
 	                        }
 	                        _this4.xhr = null;
 	                    }
-	                });
+	                };
 	            }
 	        }
 

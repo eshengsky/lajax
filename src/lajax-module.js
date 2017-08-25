@@ -273,7 +273,7 @@ class Lajax {
                     // 请求头中添加请求 id
                     this.setRequestHeader('X-Request-Id', that.reqId);
                 }
-                
+
                 // 添加 readystatechange 事件
                 this.addEventListener('readystatechange', function () {
                     // 排除掉用户自定义不需要记录日志的 ajax
@@ -410,17 +410,19 @@ class Lajax {
         if (logCount) {
             // 如果存在 this.xhr，说明上一次的请求还没有结束，就又准备发送新的请求了，则直接终止上次请求
             if (this.xhr) {
+                // 这里必须将上次的回调设为null，否则会打印出请求失败
+                this.xhr.onreadystatechange = null;
                 this.xhr.abort();
             }
             this.xhr = new XMLHttpRequest();
             this.xhrOpen.call(this.xhr, 'POST', this.url, true);
             this.xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
             this.xhrSend.call(this.xhr, JSON.stringify(this.queue));
-            this.xhr.addEventListener('readystatechange', () => {
+            this.xhr.onreadystatechange = () => {
                 if (this.xhr.readyState === XMLHttpRequest.DONE) {
                     if (this.xhr.status >= 200 && this.xhr.status < 400) {
-                        // 只有日志发送成功，才清除队列
-                        this.queue = [];
+                        // 日志发送成功，从队列中去除已发送的
+                        this.queue.splice(0, logCount);
 
                         // 重置请求出错次数
                         this.errorReq = 0;
@@ -439,7 +441,7 @@ class Lajax {
                     }
                     this.xhr = null;
                 }
-            });
+            };
         }
     }
 
