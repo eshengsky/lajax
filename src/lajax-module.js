@@ -265,9 +265,13 @@ class Lajax {
                 // 请求开始时间
                 const startTime = new Date();
 
-                // 添加一条日志到队列中，排除掉用户自定义不需要记录日志的 ajax
+                // 排除掉用户自定义不需要记录日志的 ajax
                 if (that.logAjaxFilter(this._lajaxUrl, this._lajaxMethod)) {
+                    // 添加一条日志到队列中
                     that._pushToQueue(startTime, Lajax.levelEnum.info, `[ajax] 发送${this._lajaxMethod.toLowerCase()}请求：${this._lajaxUrl}`);
+
+                    // 请求头中添加请求 id
+                    this.setRequestHeader('X-Request-Id', that.reqId);
                 }
                 
                 // 添加 readystatechange 事件
@@ -616,15 +620,6 @@ class Lajax {
      */
     error(...args) {
         this._log(null, Lajax.levelEnum.error, ...args);
-    }
-
-    /**
-     * 显示当前的日志队列
-     * 
-     * @memberof Lajax
-     */
-    showQueue() {
-        this._log(null, Lajax.levelEnum.info, this.queue);
     }
     /* eslint-enable no-console, no-bitwise*/
 }

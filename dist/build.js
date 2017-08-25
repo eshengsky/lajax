@@ -378,9 +378,13 @@
 	                    // 请求开始时间
 	                    var startTime = new Date();
 
-	                    // 添加一条日志到队列中，排除掉用户自定义不需要记录日志的 ajax
+	                    // 排除掉用户自定义不需要记录日志的 ajax
 	                    if (that.logAjaxFilter(this._lajaxUrl, this._lajaxMethod)) {
+	                        // 添加一条日志到队列中
 	                        that._pushToQueue(startTime, Lajax.levelEnum.info, '[ajax] \u53D1\u9001' + this._lajaxMethod.toLowerCase() + '\u8BF7\u6C42\uFF1A' + this._lajaxUrl);
+
+	                        // 请求头中添加请求 id
+	                        this.setRequestHeader('X-Request-Id', that.reqId);
 	                    }
 
 	                    // 添加 readystatechange 事件
@@ -796,18 +800,6 @@
 	            }
 
 	            this._log.apply(this, [null, Lajax.levelEnum.error].concat(args));
-	        }
-
-	        /**
-	         * 显示当前的日志队列
-	         * 
-	         * @memberof Lajax
-	         */
-
-	    }, {
-	        key: 'showQueue',
-	        value: function showQueue() {
-	            this._log(null, Lajax.levelEnum.info, this.queue);
 	        }
 	        /* eslint-enable no-console, no-bitwise*/
 
