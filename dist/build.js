@@ -147,7 +147,7 @@
 	        this.autoLogAjax = config.autoLogAjax == null ? true : config.autoLogAjax;
 
 	        // 默认的 ajax 自动记录情况过滤
-	        var defaultLogAjaxFilter = function defaultLogAjaxFilter() {
+	        var defaultLogAjaxFilter = function defaultLogAjaxFilter(ajaxUrl, ajaxMethod) {
 	            return true;
 	        };
 
@@ -261,6 +261,22 @@
 	        }
 
 	        /**
+	         * 默认的描述信息方法
+	         * 
+	         * @param {number} lastUnsend - 上次页面卸载前未发送的日志数
+	         * @param {string} reqId - 请求id
+	         * @param {boolean} idFromServer - 请求id是否来自服务器
+	         * @returns 最终的描述信息
+	         * @memberof Lajax
+	         */
+
+	    }, {
+	        key: '_defaultDesc',
+	        value: function _defaultDesc(lastUnsend, reqId, idFromServer) {
+	            return '\uD83D\uDE80 lajax \u524D\u7AEF\u65E5\u5FD7\u6A21\u5757\u52A0\u8F7D\u5B8C\u6210\u3002\n\u81EA\u52A8\u8BB0\u5F55\u9875\u9762\u9519\u8BEF\uFF1A      ' + (this.autoLogError ? '✔' : '✘') + '\n\u81EA\u52A8\u8BB0\u5F55Promise\u5F02\u5E38\uFF1A   ' + (this.autoLogRejection ? '✔' : '✘') + '\n\u81EA\u52A8\u8BB0\u5F55Ajax\u8BF7\u6C42\uFF1A      ' + (this.autoLogAjax ? '✔' : '✘') + '\n\u5F53\u524D\u9875\u9762\u8BF7\u6C42id\uFF1A' + reqId + (idFromServer ? ' (来自服务端)' : ' (自动生成)');
+	        }
+
+	        /**
 	         * 打印描述信息
 	         * 
 	         * @memberof Lajax
@@ -276,7 +292,7 @@
 	                    desc = '%c' + this.customDesc(this.lastUnsend, this.reqId, this.idFromServer);
 	                } else {
 	                    // 默认描述
-	                    desc = '%c\uD83D\uDE80 lajax \u524D\u7AEF\u65E5\u5FD7\u6A21\u5757\u52A0\u8F7D\u5B8C\u6210\u3002\n\u81EA\u52A8\u8BB0\u5F55\u9875\u9762\u9519\u8BEF\uFF1A      ' + (this.autoLogError ? '✔' : '✘') + '\n\u81EA\u52A8\u8BB0\u5F55Promise\u5F02\u5E38\uFF1A   ' + (this.autoLogRejection ? '✔' : '✘') + '\n\u81EA\u52A8\u8BB0\u5F55Ajax\u8BF7\u6C42\uFF1A      ' + (this.autoLogAjax ? '✔' : '✘') + '\n\u5F53\u524D\u9875\u9762\u8BF7\u6C42id\uFF1A' + this.reqId + (this.idFromServer ? ' (来自服务端)' : ' (自动生成)');
+	                    desc = '%c' + this._defaultDesc(this.lastUnsend, this.reqId, this.idFromServer);
 	                }
 	                console.log(desc, 'color: ' + Lajax.colorEnum.desc + '; font-family: \u5B8B\u4F53; line-height: 1.5;');
 	            }

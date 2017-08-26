@@ -60,7 +60,7 @@ class Lajax {
         this.autoLogAjax = config.autoLogAjax == null ? true : config.autoLogAjax;
 
         // 默认的 ajax 自动记录情况过滤
-        const defaultLogAjaxFilter = () => {
+        const defaultLogAjaxFilter = (ajaxUrl, ajaxMethod) => {
             return true;
         };
 
@@ -165,6 +165,23 @@ class Lajax {
     }
 
     /**
+     * 默认的描述信息方法
+     * 
+     * @param {number} lastUnsend - 上次页面卸载前未发送的日志数
+     * @param {string} reqId - 请求id
+     * @param {boolean} idFromServer - 请求id是否来自服务器
+     * @returns 最终的描述信息
+     * @memberof Lajax
+     */
+    _defaultDesc(lastUnsend, reqId, idFromServer) {
+        return `🚀 lajax 前端日志模块加载完成。
+自动记录页面错误：      ${this.autoLogError ? '✔' : '✘'}
+自动记录Promise异常：   ${this.autoLogRejection ? '✔' : '✘'}
+自动记录Ajax请求：      ${this.autoLogAjax ? '✔' : '✘'}
+当前页面请求id：${reqId}${idFromServer ? ' (来自服务端)' : ' (自动生成)'}`;
+    }
+
+    /**
      * 打印描述信息
      * 
      * @memberof Lajax
@@ -177,11 +194,7 @@ class Lajax {
                 desc = `%c${this.customDesc(this.lastUnsend, this.reqId, this.idFromServer)}`;
             } else {
                 // 默认描述
-                desc = `%c🚀 lajax 前端日志模块加载完成。
-自动记录页面错误：      ${this.autoLogError ? '✔' : '✘'}
-自动记录Promise异常：   ${this.autoLogRejection ? '✔' : '✘'}
-自动记录Ajax请求：      ${this.autoLogAjax ? '✔' : '✘'}
-当前页面请求id：${this.reqId}${this.idFromServer ? ' (来自服务端)' : ' (自动生成)'}`;
+                desc = `%c${this._defaultDesc(this.lastUnsend, this.reqId, this.idFromServer)}`;
             }
             console.log(desc, `color: ${Lajax.colorEnum.desc}; font-family: 宋体; line-height: 1.5;`);
         }

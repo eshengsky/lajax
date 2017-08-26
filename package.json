@@ -1,6 +1,6 @@
 {
     "name": "lajax",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "lajax - 前端日志解决方案",
     "main": "src/lajax.js",
     "dependencies": {
