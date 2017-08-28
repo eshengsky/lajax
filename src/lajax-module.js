@@ -70,6 +70,8 @@ class Lajax {
         // 是否要格式化 console 打印的内容
         this.stylize = config.stylize == null ? true : config.stylize;
 
+        this.stylize = this.stylize && this._stylizeSupport();
+
         // 是否显示描述信息
         this.showDesc = config.showDesc == null ? true : config.showDesc;
 
@@ -193,12 +195,16 @@ class Lajax {
             let desc;
             if (this.customDesc) {
                 // 自定义描述
-                desc = `%c${this.customDesc(this.lastUnsend, this.reqId, this.idFromServer)}`;
+                desc = this.customDesc(this.lastUnsend, this.reqId, this.idFromServer);
             } else {
                 // 默认描述
-                desc = `%c${this._defaultDesc(this.lastUnsend, this.reqId, this.idFromServer)}`;
+                desc = this._defaultDesc(this.lastUnsend, this.reqId, this.idFromServer);
             }
-            console.log(desc, `color: ${Lajax.colorEnum.desc}; font-family: 宋体; line-height: 1.5;`);
+            if (this.stylize) {
+                console.log(`%c${desc}`, `color: ${Lajax.colorEnum.desc}; font-family: 宋体; line-height: 1.5;`);
+            } else {
+                console.log(desc);
+            }
         }
     }
 
@@ -257,6 +263,18 @@ class Lajax {
                 this.error('[OnRejection]', err.reason);
             });
         }
+    }
+
+    /**
+     * 是否支持格式化 console 打印的内容
+     * 只有 Chrome 和 firefox 浏览器开启
+     * 
+     * @memberof Lajax
+     */
+    _stylizeSupport() {
+        const isChrome = !!window.chrome;
+        const isFirefox = navigator.userAgent.indexOf('Firefox') !== -1;
+        return isChrome || isFirefox;
     }
 
     /**
@@ -472,9 +490,7 @@ class Lajax {
         // 超过最大次数则认为服务器不可用，停止定时器
         if (this.errorReq >= this.maxErrorReq) {
             clearInterval(this.timer);
-            if (window.console) {
-                this._printConsole(null, Lajax.levelEnum.warn, `发送日志请求的连续失败次数过多，已停止发送日志。请检查日志接口 ${this.url} 是否正常！`);
-            }
+            this._printConsole(null, Lajax.levelEnum.warn, `发送日志请求的连续失败次数过多，已停止发送日志。请检查日志接口 ${this.url} 是否正常！`);
         }
     }
 

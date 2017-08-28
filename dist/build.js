@@ -157,6 +157,8 @@
 	        // 是否要格式化 console 打印的内容
 	        this.stylize = config.stylize == null ? true : config.stylize;
 
+	        this.stylize = this.stylize && this._stylizeSupport();
+
 	        // 是否显示描述信息
 	        this.showDesc = config.showDesc == null ? true : config.showDesc;
 
@@ -291,12 +293,16 @@
 	                var desc = void 0;
 	                if (this.customDesc) {
 	                    // 自定义描述
-	                    desc = '%c' + this.customDesc(this.lastUnsend, this.reqId, this.idFromServer);
+	                    desc = this.customDesc(this.lastUnsend, this.reqId, this.idFromServer);
 	                } else {
 	                    // 默认描述
-	                    desc = '%c' + this._defaultDesc(this.lastUnsend, this.reqId, this.idFromServer);
+	                    desc = this._defaultDesc(this.lastUnsend, this.reqId, this.idFromServer);
 	                }
-	                console.log(desc, 'color: ' + Lajax.colorEnum.desc + '; font-family: \u5B8B\u4F53; line-height: 1.5;');
+	                if (this.stylize) {
+	                    console.log('%c' + desc, 'color: ' + Lajax.colorEnum.desc + '; font-family: \u5B8B\u4F53; line-height: 1.5;');
+	                } else {
+	                    console.log(desc);
+	                }
 	            }
 	        }
 
@@ -366,6 +372,21 @@
 	                    _this2.error('[OnRejection]', err.reason);
 	                });
 	            }
+	        }
+
+	        /**
+	         * 是否支持格式化 console 打印的内容
+	         * 只有 Chrome 和 firefox 浏览器开启
+	         * 
+	         * @memberof Lajax
+	         */
+
+	    }, {
+	        key: '_stylizeSupport',
+	        value: function _stylizeSupport() {
+	            var isChrome = !!window.chrome;
+	            var isFirefox = navigator.userAgent.indexOf('Firefox') !== -1;
+	            return isChrome || isFirefox;
 	        }
 
 	        /**
@@ -600,9 +621,7 @@
 	            // 超过最大次数则认为服务器不可用，停止定时器
 	            if (this.errorReq >= this.maxErrorReq) {
 	                clearInterval(this.timer);
-	                if (window.console) {
-	                    this._printConsole(null, Lajax.levelEnum.warn, '\u53D1\u9001\u65E5\u5FD7\u8BF7\u6C42\u7684\u8FDE\u7EED\u5931\u8D25\u6B21\u6570\u8FC7\u591A\uFF0C\u5DF2\u505C\u6B62\u53D1\u9001\u65E5\u5FD7\u3002\u8BF7\u68C0\u67E5\u65E5\u5FD7\u63A5\u53E3 ' + this.url + ' \u662F\u5426\u6B63\u5E38\uFF01');
-	                }
+	                this._printConsole(null, Lajax.levelEnum.warn, '\u53D1\u9001\u65E5\u5FD7\u8BF7\u6C42\u7684\u8FDE\u7EED\u5931\u8D25\u6B21\u6570\u8FC7\u591A\uFF0C\u5DF2\u505C\u6B62\u53D1\u9001\u65E5\u5FD7\u3002\u8BF7\u68C0\u67E5\u65E5\u5FD7\u63A5\u53E3 ' + this.url + ' \u662F\u5426\u6B63\u5E38\uFF01');
 	            }
 	        }
 

@@ -244,6 +244,15 @@ const num = parseInt(Math.random() * 100);
 logger.info('这是一条info日志', '会产生一个随机数：', num);
 ```
 
+### log(arg1, arg2, ...args)
+
+实例方法，同 `info`。
+
+```js
+const num = parseInt(Math.random() * 100);
+logger.log('这是一条log日志', '会产生一个随机数：', num);
+```
+
 ### warn(arg1, arg2, ...args)
 
 实例方法，记录一条警告日志，可以传入任意类型、任意数量的参数。
