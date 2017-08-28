@@ -144,7 +144,9 @@ class Lajax {
      */
     _getReqId() {
         this.reqId = document.querySelector('[name="_reqId"]') ? document.querySelector('[name="_reqId"]').content : '';
-        this.reqId = window._reqId;
+        if (!this.reqId) {
+            this.reqId = window._reqId;
+        }
         if (this.reqId) {
             // 存在 reqId，说明这是一个服务器端生成的页面，设置一个标示
             this.idFromServer = true;
