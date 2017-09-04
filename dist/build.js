@@ -390,6 +390,22 @@
 	        }
 
 	        /**
+	         * 解析 url
+	         * 
+	         * @param {string} url
+	         * @returns 
+	         * @memberof Lajax
+	         */
+
+	    }, {
+	        key: '_resolveUrl',
+	        value: function _resolveUrl(url) {
+	            var link = document.createElement('a');
+	            link.href = url;
+	            return link.protocol + '//' + link.host + link.pathname + link.search + link.hash;
+	        }
+
+	        /**
 	         * 自动记录 ajax 请求
 	         * 
 	         * @memberof Lajax
@@ -408,7 +424,7 @@
 	                    }
 
 	                    this._lajaxMethod = args[0];
-	                    this._lajaxUrl = args[1];
+	                    this._lajaxUrl = that._resolveUrl(args[1]);
 	                    that.xhrOpen.apply(this, args);
 	                };
 
