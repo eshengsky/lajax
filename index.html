@@ -53,7 +53,7 @@
             autoLogAjax: true,
             logAjaxFilter: function(url, method) {
                 // 排除掉特定的接口请求
-                if (url === 'http://www.taobao.com' && method.toLowerCase() === 'get') {
+                if (url.indexOf('http://www.taobao.com') >= 0 && method.toLowerCase() === 'get') {
                     return false;
                 }
                 return true;
