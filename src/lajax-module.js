@@ -13,9 +13,10 @@ if (!('toJSON' in Error.prototype)) {
     Object.defineProperty(Error.prototype, 'toJSON', {
         value() {
             const alt = {};
-            Object.getOwnPropertyNames(this).forEach(function (key) {
-                alt[key] = this[key];
-            }, this);
+            Object.getOwnPropertyNames(this)
+                .forEach(function (key) {
+                    alt[key] = this[key];
+                }, this);
             return alt;
         },
         configurable: true,
@@ -60,9 +61,7 @@ class Lajax {
         this.autoLogAjax = config.autoLogAjax == null ? true : config.autoLogAjax;
 
         // 默认的 ajax 自动记录情况过滤
-        const defaultLogAjaxFilter = (ajaxUrl, ajaxMethod) => {
-            return true;
-        };
+        const defaultLogAjaxFilter = (ajaxUrl, ajaxMethod) => true;
 
         // ajax 自动记录情况过滤，返回 true 代表要记录日志，false 代表不记录日志
         this.logAjaxFilter = config.logAjaxFilter == null ? defaultLogAjaxFilter : config.logAjaxFilter;
@@ -111,7 +110,7 @@ class Lajax {
 
     /**
      * 初始化方法
-     * 
+     *
      * @memberof Lajax
      */
     _init() {
@@ -141,11 +140,12 @@ class Lajax {
 
     /**
      * 获取或者生成唯一请求 id
-     * 
+     *
      * @memberof Lajax
      */
     _getReqId() {
-        this.reqId = document.querySelector('[name="_reqId"]') ? document.querySelector('[name="_reqId"]').content : '';
+        this.reqId = document.querySelector('[name="_reqId"]') ? document.querySelector('[name="_reqId"]')
+            .content : '';
         if (!this.reqId) {
             this.reqId = window._reqId;
         }
@@ -162,7 +162,8 @@ class Lajax {
             this.reqId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, char => {
                 const rand = (time + (Math.random() * 16)) % 16 | 0;
                 time = Math.floor(time / 16);
-                return (char === 'x' ? rand : ((rand & 0x3) | 0x8)).toString(16);
+                return (char === 'x' ? rand : ((rand & 0x3) | 0x8))
+                    .toString(16);
             });
             this.idFromServer = false;
         }
@@ -170,7 +171,7 @@ class Lajax {
 
     /**
      * 默认的描述信息方法
-     * 
+     *
      * @param {number} lastUnsend - 上次页面卸载前未发送的日志数
      * @param {string} reqId - 请求id
      * @param {boolean} idFromServer - 请求id是否来自服务器
@@ -187,7 +188,7 @@ class Lajax {
 
     /**
      * 打印描述信息
-     * 
+     *
      * @memberof Lajax
      */
     _printDesc() {
@@ -210,8 +211,8 @@ class Lajax {
 
     /**
      * 是否开启了无痕模式
-     * 
-     * @returns 
+     *
+     * @returns
      * @memberof Lajax
      */
     _isSecret() {
@@ -227,7 +228,7 @@ class Lajax {
 
     /**
      * 从 localStorage 加载之前未发送的历史日志
-     * 
+     *
      * @memberof Lajax
      */
     _loadFromStorage() {
@@ -246,7 +247,7 @@ class Lajax {
 
     /**
      * 自动记录异常
-     * 
+     *
      * @memberof Lajax
      */
     _exceptionHandler() {
@@ -268,7 +269,7 @@ class Lajax {
     /**
      * 是否支持格式化 console 打印的内容
      * 只有 Chrome 和 firefox 浏览器开启
-     * 
+     *
      * @memberof Lajax
      */
     _stylizeSupport() {
@@ -279,9 +280,9 @@ class Lajax {
 
     /**
      * 解析 url
-     * 
+     *
      * @param {string} url
-     * @returns 
+     * @returns
      * @memberof Lajax
      */
     _resolveUrl(url) {
@@ -292,7 +293,7 @@ class Lajax {
 
     /**
      * 自动记录 ajax 请求
-     * 
+     *
      * @memberof Lajax
      */
     _ajaxHandler() {
@@ -346,7 +347,7 @@ class Lajax {
                                 }
                                 msgs.push(`请求耗时：${costTime}s URL：${this._lajaxUrl} 请求方式：${this._lajaxMethod}`);
                                 if (this._lajaxMethod.toLowerCase() === 'post') {
-                                    msgs.push('表单数据：', JSON.parse(data));
+                                    msgs.push('表单数据：', data);
                                 }
                                 msgs.push(`状态码：${this.status}`);
                                 if (this.status >= 200 && this.status < 400) {
@@ -364,59 +365,14 @@ class Lajax {
                             msgs.push('接口请求出错！');
                             msgs.push(`URL：${this._lajaxUrl} 请求方式：${this._lajaxMethod}`);
                             if (this._lajaxMethod.toLowerCase() === 'post') {
-                                msgs.push('表单数据：', JSON.parse(data));
+                                msgs.push('表单数据：', data);
                             }
                             msgs.push(`状态码：${this.status}`);
                             msgs.push(`ERROR：${err}`);
                             that.error('[ajax]', ...msgs);
                         }
-
                     }
                 });
-
-                // 排除掉自身发送日志的 ajax 和用户自定义不需要记录日志的 ajax
-                // if (this._lajaxUrl !== that.url && that.logAjaxFilter(this._lajaxUrl, this._lajaxMethod)) {
-                //     const waiter = setInterval(() => {
-                //         try {
-                //             if (this.readyState === XMLHttpRequest.DONE) {
-                //                 // 请求结束时间
-                //                 const endTime = Date.now();
-
-                //                 // 请求耗时
-                //                 const costTime = (endTime - startTime) / 1000;
-
-                //                 const msgs = [];
-                //                 if (this.status >= 200 && this.status < 400) {
-                //                     msgs.push('接口请求成功。');
-                //                 } else {
-                //                     msgs.push('接口请求失败！');
-                //                 }
-                //                 msgs.push(`请求耗时：${costTime}s URL：${this._lajaxUrl} 请求方式：${this._lajaxMethod}`);
-                //                 if (this._lajaxMethod.toLowerCase() === 'post') {
-                //                     msgs.push('表单数据：', JSON.parse(data));
-                //                 }
-                //                 msgs.push(`状态码：${this.status}`);
-                //                 if (this.status >= 200 && this.status < 400) {
-                //                     that.info('[ajax]', ...msgs);
-                //                 } else {
-                //                     that.error('[ajax]', ...msgs);
-                //                 }
-                //             }
-                //         } catch (err) {
-                //             const msgs = [];
-                //             msgs.push('接口请求出错！');
-                //             msgs.push(`URL：${this._lajaxUrl} 请求方式：${this._lajaxMethod}`);
-                //             if (this._lajaxMethod.toLowerCase() === 'post') {
-                //                 msgs.push('表单数据：', JSON.parse(data));
-                //             }
-                //             msgs.push(`状态码：${this.status}`);
-                //             msgs.push(`ERROR：${err}`);
-                //             that.error('[ajax]', ...msgs);
-                //         } finally {
-                //             clearInterval(waiter);
-                //         }
-                //     }, 50);
-                // }
 
                 that.xhrSend.call(this, data);
             };
@@ -425,7 +381,7 @@ class Lajax {
 
     /**
      * 页面卸载前检查是否还有未发送的日志
-     * 
+     *
      * @memberof Lajax
      */
     _storageUnsendData() {
@@ -448,7 +404,7 @@ class Lajax {
 
     /**
      * 发送日志请求
-     * 
+     *
      * @memberof Lajax
      */
     _send() {
@@ -460,40 +416,47 @@ class Lajax {
                 this.xhr.onreadystatechange = null;
                 this.xhr.abort();
             }
-            this.xhr = new XMLHttpRequest();
-            this.xhrOpen.call(this.xhr, 'POST', this.url, true);
-            this.xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
-            this.xhrSend.call(this.xhr, JSON.stringify(this.queue));
-            this.xhr.onreadystatechange = () => {
-                if (this.xhr.readyState === XMLHttpRequest.DONE) {
-                    if (this.xhr.status >= 200 && this.xhr.status < 400) {
-                        // 日志发送成功，从队列中去除已发送的
-                        this.queue.splice(0, logCount);
 
-                        // 重置请求出错次数
-                        this.errorReq = 0;
+            try {
+                this.xhr = new XMLHttpRequest();
+                this.xhrOpen.call(this.xhr, 'POST', this.url, true);
+                this.xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+                this.xhrSend.call(this.xhr, JSON.stringify(this.queue));
+                this.xhr.onreadystatechange = () => {
+                    if (this.xhr.readyState === XMLHttpRequest.DONE) {
+                        if (this.xhr.status >= 200 && this.xhr.status < 400) {
+                            // 日志发送成功，从队列中去除已发送的
+                            this.queue.splice(0, logCount);
 
-                        // 显示日志发送成功
-                        if (console) {
-                            if (this.stylize) {
-                                console.log(`%c[${this._getTimeString(null)}] - ${logCount}条日志发送成功！`, `color: ${Lajax.colorEnum.sendSuccess}`);
-                            } else {
-                                console.log(`${logCount}条日志发送成功！`);
+                            // 重置请求出错次数
+                            this.errorReq = 0;
+
+                            // 显示日志发送成功
+                            if (console) {
+                                if (this.stylize) {
+                                    console.log(`%c[${this._getTimeString(null)}] - ${logCount}条日志发送成功！`, `color: ${Lajax.colorEnum.sendSuccess}`);
+                                } else {
+                                    console.log(`${logCount}条日志发送成功！`);
+                                }
                             }
+                        } else {
+                            this._printConsole(null, Lajax.levelEnum.error, `发送日志请求失败！配置的接口地址：${this.url} 状态码：${this.xhr.status}`);
+                            this._checkErrorReq();
                         }
-                    } else {
-                        this._printConsole(null, Lajax.levelEnum.error, `发送日志请求失败！配置的接口地址：${this.url} 状态码：${this.xhr.status}`);
-                        this._checkErrorReq();
+                        this.xhr = null;
                     }
-                    this.xhr = null;
-                }
-            };
+                };
+            } catch (err) {
+                this._printConsole(null, Lajax.levelEnum.error, `发送日志请求失败！配置的接口地址：${this.url}`);
+                this._checkErrorReq();
+                this.xhr = null;
+            }
         }
     }
 
     /**
      * 检查请求出错次数
-     * 
+     *
      * @memberof Lajax
      */
     _checkErrorReq() {
@@ -509,9 +472,9 @@ class Lajax {
 
     /**
      * 获取时间字符串
-     * 
-     * @param {Date} time - 记录时间 
-     * @returns 
+     *
+     * @param {Date} time - 记录时间
+     * @returns
      * @memberof Lajax
      */
     _getTimeString(time) {
@@ -548,9 +511,9 @@ class Lajax {
 
     /**
      * 获取日期时间字符串
-     * 
+     *
      * @param {Date} time - 记录时间
-     * @returns 
+     * @returns
      * @memberof Lajax
      */
     _getDateTimeString(time) {
@@ -576,10 +539,10 @@ class Lajax {
 
     /**
      * 调用系统 console 打印日志
-     * 
-     * @param {any} time 
-     * @param {any} level 
-     * @param {any} args 
+     *
+     * @param {any} time
+     * @param {any} level
+     * @param {any} args
      * @memberof Lajax
      */
     _printConsole(time, level, ...args) {
@@ -594,10 +557,10 @@ class Lajax {
 
     /**
      * 将日志添加到队列中
-     * 
-     * @param {any} time 
-     * @param {any} level 
-     * @param {any} args 
+     *
+     * @param {any} time
+     * @param {any} level
+     * @param {any} args
      * @memberof Lajax
      */
     _pushToQueue(time, level, ...args) {
@@ -613,7 +576,7 @@ class Lajax {
 
     /**
      * 将日志打印到控制台并添加到队列
-     * 
+     *
      * @param {Date} time - 记录时间
      * @param {Lajax.levelEnum} level - 日志级别
      * @param {any} args - 日志内容
@@ -629,7 +592,7 @@ class Lajax {
 
     /**
      * 记录一条信息日志
-     * 
+     *
      * @param {any} args - 日志内容
      * @memberof Lajax
      */
@@ -640,8 +603,8 @@ class Lajax {
     /**
      * 记录一条普通日志
      * info 方法的别名
-     * 
-     * @param {any} args 
+     *
+     * @param {any} args
      * @memberof Lajax
      */
     log(...args) {
@@ -650,7 +613,7 @@ class Lajax {
 
     /**
      * 记录一条警告日志
-     * 
+     *
      * @param {any} args - 日志内容
      * @memberof Lajax
      */
@@ -660,7 +623,7 @@ class Lajax {
 
     /**
      * 记录一条错误日志
-     * 
+     *
      * @param {any} args - 日志内容
      * @memberof Lajax
      */
